@@ -103,7 +103,8 @@ contract TicketExpress is ERC721, Ownable {
             "No tickets available"
         );
         require(msg.value == events[_eventId].ticketPrice, "Incorrect price");
-        mintTicket(msg.sender, _eventId);
+        ticketId++;
+        _mint(msg.sender, ticketId);
         events[_eventId].ticketsSold++;
     }
 
@@ -121,4 +122,12 @@ contract TicketExpress is ERC721, Ownable {
         delete ticketsForSale[_ticketId];
         emit TicketSold(_ticketId, msg.sender, msg.value);
     }
+
+    function withdraw() public onlyOwner {
+        // This will transfer the contract balance to the owner.
+        // =============================================================================
+        (bool os, ) = payable(owner()).call{value: address(this).balance}("");
+        require(os);
+        // =============================================================================
+  }
 }
