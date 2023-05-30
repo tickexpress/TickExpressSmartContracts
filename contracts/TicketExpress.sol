@@ -37,6 +37,7 @@ contract TicketExpress is ERC721, Ownable {
     constructor() ERC721("TicketExpress", "TICK") {}
 
     function mintTicket(address to, uint256 eventId) public onlyOwner {
+        require(eventId < events.length, "Event does not exist");
         require(!events[eventId].isCancelled, "Event is cancelled");
         require(
             events[eventId].ticketsSold < events[eventId].totalTickets,
@@ -70,6 +71,7 @@ contract TicketExpress is ERC721, Ownable {
     }
 
     function cancelEvent(uint256 _eventId) public onlyOwner {
+        require(_eventId < events.length, "Event does not exist");
         events[_eventId].isCancelled = true;
         emit EventCancelled(_eventId);
     }
@@ -117,17 +119,22 @@ contract TicketExpress is ERC721, Ownable {
             msg.value == ticketsForSale[_ticketId].price,
             "Incorrect price"
         );
-        payable(ownerOf(_ticketId)).transfer(msg.value);
-        _transfer(ownerOf(_ticketId), msg.sender, _ticketId);
+
+        // Effect: Update state before interacting with external contract
+        uint256 price = ticketsForSale[_ticketId].price;
+        address previousOwner = ownerOf(_ticketId);
         delete ticketsForSale[_ticketId];
+
+        // Interaction: transfer funds and ticket ownership
+        payable(previousOwner).transfer(price);
+        _transfer(previousOwner, msg.sender, _ticketId);
+
         emit TicketSold(_ticketId, msg.sender, msg.value);
     }
 
-    function withdraw() public onlyOwner {
-        // This will transfer the contract balance to the owner.
-        // =============================================================================
-        (bool os, ) = payable(owner()).call{value: address(this).balance}("");
-        require(os);
-        // =============================================================================
-  }
+    function withdraw(uint256 _amount) public onlyOwner {
+        require(_amount <= address(this).balance, "Insufficient balance");
+        (bool success, ) = payable(owner()).call{value: _amount}("");
+        require(success, "Transfer failed");
+    }
 }
