@@ -21,6 +21,11 @@ contract TicketExpress is ERC721, Ownable, PriceFeed {
 
     uint256 public ticketId;
 
+    struct CryptoPayment {
+        address tokenAddress;
+        uint256 amount;
+    }
+
     struct Event {
         string name;
         uint256 ticketPrice;
