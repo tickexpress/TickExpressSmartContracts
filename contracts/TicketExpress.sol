@@ -122,10 +122,10 @@ contract TicketExpress is ERC721, Ownable, PriceFeed {
         CryptoPayment memory payment
     ) public {
         // Make sure the ticket is for sale
-        require(tickets[_ticketId].forSale, "Ticket is not for sale");
+        require(ticketsForSale[_ticketId].price != 0, "Ticket is not for sale");
 
         // Get the sale price of the ticket in USD
-        uint256 salePriceUSD = tickets[_ticketId].salePrice;
+        uint256 salePriceUSD = ticketsForSale[_ticketId].price;
 
         // Get the latest price for the cryptocurrency
         int256 latestPrice = getLatestPrice(payment.tokenAddress);
@@ -145,13 +145,12 @@ contract TicketExpress is ERC721, Ownable, PriceFeed {
         );
 
         // Transfer the ticket from the seller to the buyer
-        _transfer(tickets[_ticketId].owner, msg.sender, _ticketId);
+        _transfer(ownerOf(_ticketId), msg.sender, _ticketId);
 
-        // Update the ticket owner and forSale status
-        tickets[_ticketId].owner = msg.sender;
-        tickets[_ticketId].forSale = false;
+        // Unlist the ticket
+        delete ticketsForSale[_ticketId];
 
-        emit TicketSold(_ticketId, msg.sender, msg.value);
+        emit TicketSold(_ticketId, msg.sender, payment.amount);
     }
 
     function withdraw(uint256 _amount) public onlyOwner {
