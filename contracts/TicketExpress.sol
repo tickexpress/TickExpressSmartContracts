@@ -3,8 +3,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./PriceFeed.sol";
 
-contract TicketExpress is ERC721, Ownable {
+contract TicketExpress is ERC721, Ownable, PriceFeed {
     event TicketMinted(address recipient, uint256 ticketId);
     event TicketListedForSale(uint256 ticketId, address seller, uint256 price);
     event TicketUnlisted(uint256 ticketId, address seller);
@@ -110,24 +112,39 @@ contract TicketExpress is ERC721, Ownable {
         events[_eventId].ticketsSold++;
     }
 
-    function buyTicketForSale(uint256 _ticketId) public payable {
+    function buyTicketForSale(
+        uint256 _ticketId,
+        CryptoPayment memory payment
+    ) public {
+        // Make sure the ticket is for sale
+        require(tickets[_ticketId].forSale, "Ticket is not for sale");
+
+        // Get the sale price of the ticket in USD
+        uint256 salePriceUSD = tickets[_ticketId].salePrice;
+
+        // Get the latest price for the cryptocurrency
+        int256 latestPrice = getLatestPrice(payment.tokenAddress);
+
+        // Convert the sale price to the equivalent amount of the cryptocurrency
+        // Assuming that the price is in USD and the latestPrice is the price of 1 token in USD
+        uint256 salePriceInCrypto = (salePriceUSD * 1e8) / uint256(latestPrice); // Chainlink price feeds have 8 decimal places
+
+        // Compare the amount of the cryptocurrency sent with the sale price
+        require(payment.amount >= salePriceInCrypto, "Insufficient payment");
+
+        // Transfer the tokens from the buyer to the contract
+        IERC20 token = IERC20(payment.tokenAddress);
         require(
-            ticketsForSale[_ticketId].ticketId == _ticketId,
-            "Ticket not for sale"
-        );
-        require(
-            msg.value == ticketsForSale[_ticketId].price,
-            "Incorrect price"
+            token.transferFrom(msg.sender, address(this), payment.amount),
+            "Token transfer failed"
         );
 
-        // Effect: Update state before interacting with external contract
-        uint256 price = ticketsForSale[_ticketId].price;
-        address previousOwner = ownerOf(_ticketId);
-        delete ticketsForSale[_ticketId];
+        // Transfer the ticket from the seller to the buyer
+        _transfer(tickets[_ticketId].owner, msg.sender, _ticketId);
 
-        // Interaction: transfer funds and ticket ownership
-        payable(previousOwner).transfer(price);
-        _transfer(previousOwner, msg.sender, _ticketId);
+        // Update the ticket owner and forSale status
+        tickets[_ticketId].owner = msg.sender;
+        tickets[_ticketId].forSale = false;
 
         emit TicketSold(_ticketId, msg.sender, msg.value);
     }
