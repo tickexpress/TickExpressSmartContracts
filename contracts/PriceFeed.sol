@@ -11,14 +11,14 @@ contract PriceFeed {
         // Initialize price feeds for desired tokens
         // For Mumbai Testnet
         priceFeeds[
-            0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270
-        ] = 0xAB594600376Ec9fD91F8e885dADF0CE036862dE0; // MATIC
+            0x0000000000000000000000000000000000001010
+        ] = 0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada; // Polygon (MATIC)
         priceFeeds[
-            0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619
-        ] = 0x327E23A4855b6f663A28C5161541Ded4b5757A1a; // WETH
+            0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa
+        ] = 0x0715A7794a1dc8e42615F059dD6e406A6594651A; // PoS-WETH (ETH)
         priceFeeds[
-            0xc2132D05D31c914a87C6611C10748AEb04B58e8F
-        ] = 0x0A6513e40db6EB1b165753AD52E80663aeA50545; // USDT
+            0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e
+        ] = 0x92C09849638959196E976289418e5973CC96d645; // ERC20-TestToken (USDT)
     }
 
     // Get the latest price from the price feed
