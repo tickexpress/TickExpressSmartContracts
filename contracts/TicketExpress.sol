@@ -137,15 +137,16 @@ contract TicketExpress is ERC721, Ownable, PriceFeed {
         // Compare the amount of the cryptocurrency sent with the sale price
         require(payment.amount >= salePriceInCrypto, "Insufficient payment");
 
-        // Transfer the tokens from the buyer to the contract
+        // Transfer the tokens from the buyer to the seller
         IERC20 token = IERC20(payment.tokenAddress);
+        address seller = ownerOf(_ticketId);
         require(
-            token.transferFrom(msg.sender, address(this), payment.amount),
+            token.transferFrom(msg.sender, seller, payment.amount),
             "Token transfer failed"
         );
 
         // Transfer the ticket from the seller to the buyer
-        _transfer(ownerOf(_ticketId), msg.sender, _ticketId);
+        _transfer(seller, msg.sender, _ticketId);
 
         // Unlist the ticket
         delete ticketsForSale[_ticketId];
