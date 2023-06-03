@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
 <a href="https://chain.link" target="_blank">
-<img src=".\TicketExpress funtionality visualization.png" width="225" alt="Chainlink Hardhat logo">
+<img src=".\TicketExpress funtionality visualization.png" width="100%" alt="Chainlink Hardhat logo">
 </a>
 </p>
 <br/>
