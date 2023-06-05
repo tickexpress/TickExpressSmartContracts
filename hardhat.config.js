@@ -17,11 +17,12 @@ const MAINNET_RPC_URL =
     process.env.ALCHEMY_MAINNET_RPC_URL ||
     "https://eth-mainnet.alchemyapi.io/v2/your-api-key"
 const POLYGON_MAINNET_RPC_URL =
-    process.env.POLYGON_MAINNET_RPC_URL || "https://polygon-mainnet.alchemyapi.io/v2/your-api-key"
-const SEPOLIA_RPC_URL =
-    process.env.SEPOLIA_RPC_URL;
+    process.env.POLYGON_MAINNET_RPC_URL ||
+    "https://polygon-mainnet.g.alchemy.com/v2/st0zotIIcE_WzlGJXDYfr9NxlVLlYYJ6"
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL
 const MUMBAI_RPC_URL =
-    process.env.MUMBAI_RPC_URL || "https://polygon-mumbai.g.alchemy.com/v2/your-api-key"
+    process.env.MUMBAI_RPC_URL ||
+    "https://polygon-mumbai.g.alchemy.com/v2/192ONKJM3kkNLbDtz254cUQYzVNLzOEa"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 // optional
 const MNEMONIC = process.env.MNEMONIC || "Your mnemonic"
